@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+    div{
+        text-align: center;
+        background: rgb(110, 240, 93);
+        width: 200px;
+        position: absolute;
+        transition: 0.5s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    img{
+        width: 100%;
+        height: 100%;
+    }
+    span{
+        display: none;
+    }
+    .cover{
+        display: block;
+        font-weight: 900;
+        position: absolute;
+        top: 0px;
+        text-align: center;
+    }
+    .beian{
+        width: 200px;
+        height: 100px;
+        background-color: red;
+        position: fixed;
+        left: 20px;
+        top: 20px;
+        z-index: 100;
+        display: inline;
+    }
+    </style>
+</head>
+<body>
+    <span class="beian">
+        <h1>备案位置</h1>
+    </span>
+    <script type="text/javascript">
+    //1.初始化,每一次再刷新页面的时候，会自动生成20个div
+    //2.等宽不等高  且高度是个随机数
+    //3.div盒子摆放也是随机的
+    //4.div盒子之间有间据 10px 且第一排top为0
+    //5.窗口一排能够排列多少盒子 这个取决于窗口高度
+
+    // 1、刷新页面的时候 出现20个盒子
+    createDiv();
+    function createDiv() {
+        for(var i = 0; i < 20; i++){
+            //创建div
+            var div = document.createElement('div');
+            //需要给一个随机高度 50~350之间
+            var rand = Math.floor(Math.random()*350+50);
+            div.style.height = rand + "px";
+            div.innerHTML = "往下翻，能到底吗？</br>不能吧，哈哈哈"
+            //将div插入文档中 js遍历
+            document.body.appendChild(div);
+
+
+            //最后一步加入图片   图片为 1.jpg 格式
+            // var img = document.createElement('img');
+            // img.setAttribute("src","img/" + i + ".jpg");
+            // div.appendChild(img);
+        }
+        //瀑布流调用
+        change();
+    }
+    
+    // 2、瀑布流的布局
+    function change() {
+        //3.我们需要知道一排排列多少个div 所以需要知道窗口的大小
+        var aDiv = document.getElementsByTagName('div');
+        //4.视口的宽度
+        var windowCW = document.documentElement.clientWidth;
+        //5.一行诸多多少div 10就是div间据
+        var n = Math.floor(windowCW / 210);
+        //6.窗口在改变的时候 也是需要出现效果的
+        if(n <= 0) return;
+        //7.让盒子左右居中 获取盒子两侧间据
+        var center = (windowCW - n*210)/2;
+        //8.定义盒子高度 高度随机 数组
+        var arrH = [];
+        //9.循环div盒子
+        for(var i = 0; i < aDiv.length; i++){
+            //10 定一个变量 存放数组下标
+            var j = i%n;
+            //当第一排排满 第二排从第一排高度最小的开始
+            //来一个判断  第一排从左到右
+            if(arrH.length == n) {
+                // 需要找到最小下表
+                var min = findMin(arrH);
+                aDiv[i].style.left = center + min*210 + "px";
+                aDiv[i].style.top = arrH[min] + 10 + "px";
+                arrH[min] += aDiv[i].offsetHeight + 10;
+            }else{
+                //12.先存储第一行 将高度存到数组arrH
+                arrH[j] = aDiv[i].offsetHeight;
+                aDiv[i].style.left = center + 200*j + 10*j + "px";
+                aDiv[i].style.top = 0;
+            }
+        }
+    }
+
+    //找出最小的下标
+    function findMin(arr) {
+        var m = 0;
+        for(var i = 0; i < arr.length; i++){
+            m = Math.min(arr[m],arr[i]) == arr[m] ? m : i;
+        }
+        return m;
+    }
+
+    //滚动条滚动能够继续生成div
+    window.onscroll = function(){
+        //当滚动条滚动距离+可视区高度 > 文档的高度
+        //可视区高度
+        var windowHeight = document.documentElement.clientHeight;
+        //文档滚动距离
+        var scrollTop = document.documentElement.scrollTop;
+        //液面高度
+        var scrollH = document.body.scrollHeight;
+
+        if(windowHeight + scrollTop >= scrollH){
+            createDiv();
+        }
+    }
+
+    // 当窗口改变的时候
+    window.onresize = function(){
+        createDiv();
+    }
+
+
+
+    </script>
+
+
+</body>
+</html>
